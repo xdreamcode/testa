@@ -11,6 +11,8 @@ organization := "io.dreamcode"
 
 //updateOptions := updateOptions.value.withGigahorse(false)
 //publishTo := Some("Xavier Nexus" at "http://35.168.35.94:8081/repository/maven-releases/")
+resolvers += "jitpack" at "https://jitpack.io"
+
 
 publishTo := {
   val nexus = "http://jitpack.io/repository/"
@@ -73,4 +75,4 @@ credentials += Credentials("Sonatype Nexus Repository Manager", "35.168.35.94", 
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % "2.2.1"
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.2.1"
-libraryDependencies += "mrpowers" % "spark-daria" % "2.2.0_0.15.0"%"runtime"
+libraryDependencies += "mrpowers" % "spark-daria" % "2.2.0_0.15.0"
