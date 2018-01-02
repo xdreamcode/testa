@@ -9,7 +9,7 @@ version := "0.5.1"
 
 organization := "io.dreamcode"
 
-updateOptions := updateOptions.value.withGigahorse(false)
+//updateOptions := updateOptions.value.withGigahorse(false)
 //publishTo := Some("Xavier Nexus" at "http://35.168.35.94:8081/repository/maven-releases/")
 
 publishTo := {
