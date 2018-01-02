@@ -1,0 +1,112 @@
+# Scala CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/sample-config/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk
+
+    working_directory: ~/repo
+
+    environment:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "build.sbt" }}
+          - v1-dependencies-
+
+      - run: cat /dev/null | sbt test:compile
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies--{{ checksum "build.sbt" }}
+
+      - run: cat /dev/null | sbt test:test
+  deploy-snapshot:
+    docker:
+      - image: circleci/openjdk:8-jdk
+
+    working_directory: ~/repo
+
+    environment:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - checkout
+      - run:
+          name: Chmod
+          command: chmod +x .circleci/commands/deploy-snapshot.sh
+      - run:
+          name: Sbt Release
+          command: .circleci/commands/deploy-snapshot.sh
+
+  deploy-release:
+    docker:
+      - image: circleci/openjdk:8-jdk
+
+    working_directory: ~/repo
+
+    environment:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - checkout
+      - run:
+          name: Chmod
+          command: chmod +x .circleci/commands/deploy-release.sh
+      - run:
+          name: Sbt Release
+          command: .circleci/commands/deploy-release.sh
+  deploy-databricks:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    working_directory: ~/repo
+    steps:
+      - run:
+          name: Rest API
+          command: echo 'No yet implemented but use this docs.databricks.com/api/latest/libraries.html'
+workflows:
+  version: 2
+  snapshot-deployment:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+               - develop
+      - deploy-snapshot:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+               - develop
+  release-deployment:
+     jobs:
+       - build:
+           filters:
+             branches:
+               only:
+                - master
+       - deploy-release:
+           requires:
+             - build
+           filters:
+             branches:
+               only:
+                - master
+       - deploy-databricks:
+           requires:
+             - deploy-release
+           filters:
+             branches:
+               only:
+                - master
